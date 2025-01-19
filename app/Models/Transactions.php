@@ -13,14 +13,19 @@ class Transactions extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
-        'user_id',
         'amount',
         'type',
         'date',
-        'description'
+        'description',
+        'user_id'
     ];
 
     protected $casts = [
         'date' => 'datetime'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

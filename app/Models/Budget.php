@@ -13,4 +13,9 @@ class Budget extends Model
     protected $fillable = [
         'monthly_limit'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
