@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthRegisterController extends Controller
@@ -19,10 +20,20 @@ class AuthRegisterController extends Controller
         $user = User::create($fields);
 
         $token = $user->createToken($request->name);
-        return [
-            'user' => $user,
-            'token' => $token->plainTextToken
-        ];
+
+
+        // Api Handling
+        if ($request->expectsJson()) {
+            // API response
+            return response()->json([
+                'user' => $user,
+                'token' => $token,
+            ]);
+        }
+
+        // Web app: Authenticate and redirect
+        Auth::login($user);
+        return redirect()->intended('/');
     }
 
     public function login(Request $request)
@@ -36,26 +47,59 @@ class AuthRegisterController extends Controller
         $user = User::where('email',$request->email)->first();
 
         if(!$user || !Hash::check($request->password,$user->password)){
-            return [
-                'message' => 'The provided credentials are incorrect!'
-            ];
+            if ($request->expectsJson()) {
+                // API response
+                return response()->json([
+                    'message' => 'The provided credentials are incorrect!',
+                ], 401);
+            }
+
+            // Web app: Redirect back with error
+            return back()->withErrors(['email' => 'The provided credentials are incorrect!']);
         }
 
         $token = $user->createToken($user->name);
 
-        return [
-            'user' => $user,
-            'token' => $token->plainTextToken
-        ];
+        // Handle Api Request If Accepted
+        if ($request->expectsJson()) {
+            // API response
+            return response()->json([
+                'user' => $user,
+                'token' => $token->plainTextToken,
+            ]);
+        }
+
+        // Web App If Accepted
+        Auth::login($user);
+        session(['auth_token' => $token]);
+        return redirect()->intended('/');
 
     }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        // API Request Handling
+        if ($request->expectsJson()) {
+            // API response: Invalidate tokens
+            $request->user()->tokens()->delete();
+            return response()->json(['message' => 'Logged Out.']);
+        }
 
-        return [
-            'message' => 'Logged Out.'
-        ];
+        // Web app: Logout and clear session
+        if ($request->user()) {
+            $request->user()->tokens()->delete();
+        }
+
+        Auth::logout();
+
+        // Forget Token Only for This Session
+        // session()->forget('auth_token');
+
+
+        // Fully Delete Token From Databases
+        $request->session()->invalidate(); // Invalidate the session
+        $request->session()->regenerateToken(); // Regenerate the CSRF token
+
+        return redirect('/login');
     }
 }

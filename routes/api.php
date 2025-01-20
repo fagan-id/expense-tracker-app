@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\AuthRegisterController;
-use App\Http\Controllers\BudgetController;
-use App\Http\Controllers\TransactionsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\AuthRegisterController;
+use App\Http\Controllers\TransactionsController;
 
 Route::post('/register', [AuthRegisterController::class,'register']);
 Route::post('/login',[AuthRegisterController::class,'login']);
