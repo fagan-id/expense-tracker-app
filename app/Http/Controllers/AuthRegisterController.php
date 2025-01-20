@@ -27,7 +27,7 @@ class AuthRegisterController extends Controller
             // API response
             return response()->json([
                 'user' => $user,
-                'token' => $token,
+                'token' => $token->plainTextToken,
             ]);
         }
 
@@ -80,7 +80,6 @@ class AuthRegisterController extends Controller
     {
         // API Request Handling
         if ($request->expectsJson()) {
-            // API response: Invalidate tokens
             $request->user()->tokens()->delete();
             return response()->json(['message' => 'Logged Out.']);
         }
@@ -89,7 +88,6 @@ class AuthRegisterController extends Controller
         if ($request->user()) {
             $request->user()->tokens()->delete();
         }
-
         Auth::logout();
 
         // Forget Token Only for This Session
