@@ -15,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Define Newly Added Policies
         Gate::define('modify', [AuthRegisterPolicy::class, 'modify']);
+        Gate::define('changeBudget', [AuthRegisterPolicy::class, 'changeBudget']);
     }
 
     /**

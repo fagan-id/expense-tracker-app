@@ -5,11 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Budget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreBudgetRequest;
 use App\Http\Requests\UpdateBudgetRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class BudgetController extends Controller
+class BudgetController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:sanctum',except: ['index','show'])
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
@@ -25,39 +34,45 @@ class BudgetController extends Controller
     public function store(Request $request)
     {
         $fields = $request->validate([
-            'amount' => 'required|numeric',
-            'type' =>  'required|in:income,expense',
-            'date' => 'required|date',
-            'description' => 'nullable|string|max:255',
+            'monthly_limit' => 'required|numeric'
         ]);
 
-        $fields['user_id'] = Auth::id();
+        if($request->user()->budgets){
+            return ['message' => "Already Created a Budget for This Month, Please Use Update!"];
+        }
 
-        Budget::create($fields);
-        return ['budget' => $fields];
+        $budgets = $request->user()->budgets()->create($fields);
+        return [
+            'message' => "Succesfully Created A Limit For This Month!",
+            'budget' => $budgets,
+            ];
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Budget $budget)
+    public function show($id)
     {
+        $budget = Budget::findOrFail($id);
         return ['budget'=>$budget];
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Budget $budget)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $budget = Budget::findOrFail($id);
+        Gate::authorize('changeBudget', $budget);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Budget $budget)
-    {
-        //
+
+        $fields = $request->validate([
+            'monthly_limit' => 'required|numeric'
+        ]);
+
+        $budget->update($fields);
+
+        return ["message" => "Succesfully Updated Budgets for this Month!",
+        "budget" => $budget];
     }
 }
