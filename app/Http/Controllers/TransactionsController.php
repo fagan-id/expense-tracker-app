@@ -43,13 +43,15 @@ class TransactionsController extends Controller implements HasMiddleware
             'description' => 'nullable|string|max:255',
         ]);
 
-        // $fields['user_id'] = Auth::id();
-
-        // Transactions::create($fields);
-
         $post = $request->user()->transactions()->create($fields);
 
-        return ['transactions' => $post];
+        // Handle API Request
+        if ($request->expectsJson()) {
+            return ['transactions' => $post];
+        }
+
+        // View
+        return redirect()->back();
     }
 
     /**
@@ -81,8 +83,13 @@ class TransactionsController extends Controller implements HasMiddleware
 
         $transactions->update($fields);
 
-        return ["message" => "Transactions succesfully Updated",
-                "transactions" => $transactions];
+        // Handle API Request
+        if ($request->expectsJson()) {
+            return ["message" => "Transactions succesfully Updated",
+            "transactions" => $transactions];
+        }
+
+        return redirect()->back();
     }
 
     /**

@@ -11,7 +11,6 @@ class AuthRegisterController extends Controller
 {
     public function register(Request $request)
     {
-
         $fields = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
@@ -97,7 +96,6 @@ class AuthRegisterController extends Controller
 
         // Forget Token Only for This Session
         // session()->forget('auth_token');
-
 
         // Fully Delete Token From Databases
         $request->session()->invalidate(); // Invalidate the session
