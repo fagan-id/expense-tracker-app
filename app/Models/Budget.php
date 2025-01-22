@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Budget extends Model
 {
+    // SUBJECT TO CHANGE
+
     /** @use HasFactory<\Database\Factories\BudgetFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'monthly_limit'
+        'monthly_limit',
+        'month',
+        'year'
     ];
 
     public function user()

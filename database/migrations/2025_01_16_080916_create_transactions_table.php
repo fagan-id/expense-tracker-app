@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->bigInteger('amount');
+            $table->enum('category',array('Transportation','Entertainment','Utilities','Food & Beverages','Health Care','Education','Investment','Others'));
             $table->enum('type',array('income','expense'));
             $table->dateTime('date');
             $table->text('description')->nullable();

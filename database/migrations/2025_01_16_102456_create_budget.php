@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->bigInteger('monthly_limit');
+            $table->integer('month')->unsigned(); // Represents the month (1 = January, 12 = December)
+            $table->integer('year')->unsigned(); // e.g 2000, 2005, 2024
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

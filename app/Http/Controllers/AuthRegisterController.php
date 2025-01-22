@@ -15,8 +15,11 @@ class AuthRegisterController extends Controller
         $fields = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed'
+            'password' => 'required|confirmed',
+            'phone_number' => 'nullable|string',
+            'birth_date' => 'required|date',
         ]);
+
         $user = User::create($fields);
 
         $token = $user->createToken($request->name);
@@ -33,18 +36,20 @@ class AuthRegisterController extends Controller
 
         // Web app: Authenticate and redirect
         Auth::login($user);
-        return redirect()->intended('/');
+        return redirect()->intended('/dashboard');
     }
 
     public function login(Request $request)
     {
 
         $request->validate([
-            'email'=> 'required|email|exists:users',
+            'identifier'=> 'required|string',
             'password' => 'required'
         ]);
 
-        $user = User::where('email',$request->email)->first();
+        $user = User::where('email',$request->identifier)
+                ->orWhere('name',$request->identifier)
+                ->first();
 
         if(!$user || !Hash::check($request->password,$user->password)){
             if ($request->expectsJson()) {
@@ -72,7 +77,7 @@ class AuthRegisterController extends Controller
         // Web App If Accepted
         Auth::login($user);
         session(['auth_token' => $token]);
-        return redirect()->intended('/');
+        return redirect()->intended('/dashboard');
 
     }
 

@@ -34,14 +34,36 @@ class BudgetController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $fields = $request->validate([
-            'monthly_limit' => 'required|numeric'
+            'monthly_limit' => 'required|numeric',
         ]);
 
-        if($request->user()->budgets){
-            return ['message' => "Already Created a Budget for This Month, Please Use Update!"];
+        // Get the current month and year
+        $month = now()->month;
+        $year = now()->year;
+
+        $existingBudget = $request->user()->budgets()
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+
+        if ($existingBudget) {
+            return response()->json([
+                'message' => "A budget for this month already exists. Please use the update method!",
+            ], 400);
         }
 
+        // Add the month and year to the fields
+        $fields['month'] = $month;
+        $fields['year'] = $year;
+
+        // if($request->user()->budgets){
+        //     return ['message' => "Already Created a Budget for This Month, Please Use Update!"];
+        // }
+
+
         $budgets = $request->user()->budgets()->create($fields);
+
+
         return [
             'message' => "Succesfully Created A Limit For This Month!",
             'budget' => $budgets,

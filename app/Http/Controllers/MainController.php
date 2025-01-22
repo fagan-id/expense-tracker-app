@@ -2,67 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Budget;
+use App\Models\Transactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\Middleware;
 
 class MainController
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:sanctum')
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         if (Auth::check()) {
-            return view('dashboard');
+            $transactions = Auth::user()->transactions;
+            $budget =  Auth::user()->transactions;
+
+            return view('dashboard',compact('transactions', 'budget'));
         }
         return redirect()->route('login');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function transactions()
     {
-        //
+        //TBA
+        return view('transaction-plan');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function settings()
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        //TBA
+        return view('settings');
     }
 }

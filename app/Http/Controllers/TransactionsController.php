@@ -37,6 +37,7 @@ class TransactionsController extends Controller implements HasMiddleware
     {
         $fields = $request->validate([
             'amount' => 'required|numeric',
+            'category' => 'required|in:Transportation,Entertainment,Utilities,Food & Beverages,Health Care,Education,Investment,Others',
             'type' =>  'required|in:income,expense',
             'date' => 'required|date',
             'description' => 'nullable|string|max:255',
@@ -72,6 +73,7 @@ class TransactionsController extends Controller implements HasMiddleware
 
         $fields = $request->validate([
             'amount' => 'required|numeric',
+            'category' => 'required|in:Transportation,Entertainment,Utilities,Food & Beverages,Health Care,Education,Investment,Others',
             'type' =>  'required|in:income,expense',
             'date' => 'required|date',
             'description' => 'nullable|string|max:255',
