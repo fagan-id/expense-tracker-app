@@ -22,6 +22,7 @@ export default {
                 'green-gradient': 'linear-gradient(to right, #C6EBC5 10%, white 50%)',
             },
             fontFamily: {
+                //hiraukan banyaknya font ini, sempet nyoba-nyoba soale
                 mono: ["Syne", "monospace"],
                 inter: ["Inter", "sans-serif"], 
                 Fira_Code: ['Fira_Code', 'monospace'],
