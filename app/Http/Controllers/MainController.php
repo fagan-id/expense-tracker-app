@@ -26,7 +26,7 @@ class MainController
             $transactions = Auth::user()->transactions;
             $budget =  Auth::user()->transactions;
 
-            return view('dashboard',compact('transactions', 'budget'));
+            return view('components.dashboard',compact('transactions', 'budget'));
         }
         return redirect()->route('login');
     }

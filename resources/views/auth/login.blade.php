@@ -14,26 +14,31 @@
             <h1 class="text-xl md:text-2xl font-bold text-black mb-6">Hi, Selamat datang kembali!</h1>
             <form action="{{ route('login.submit') }}" method="POST" class="w-full md:w-[80%] space-y-4" x-data="formHandler()">
                 @csrf
-    
-                <!-- Flash Error: Internal Modal -->
+
+                {{-- <!-- Flash Error: Internal Modal -->
                 <div x-show="internalError" class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded-md">
                     Gagal login, coba lagi!
+                </div> --}}
+
+                <!-- Flash Error: Internal Modal -->
+                <div x-show="{{ $errors->has('error') ? 'true' : 'false' }}" class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded-md">
+                    {{ $errors->first('error') }}
                 </div>
-    
+
                 <!-- Username or Email -->
                 <div>
                     <label for="identifier" class="block text-black mb-2">Email or Username</label>
-                    <input type="text" name="identifier" id="identifier" x-model="identifier" 
+                    <input type="text" name="identifier" id="identifier" x-model="identifier"
                         class="w-full px-4 py-2 bg-primary border-2 border-black rounded-md focus:ring-2 focus:ring-fourth"
                         required />
                     <p x-show="identifierError" class="text-red-600 text-sm mt-1" x-text="identifierError"></p>
                 </div>
-    
+
                 <!-- Password -->
                 <div>
                     <label for="password" class="block text-black mb-2">Password</label>
                     <div class="relative">
-                        <input :type="showPassword ? 'text' : 'password'" name="password" id="password" 
+                        <input :type="showPassword ? 'text' : 'password'" name="password" id="password"
                             x-model="password"
                             class="w-full px-4 py-2 bg-primary border-2 border-black rounded-md focus:ring-2 focus:ring-fourth"
                             required />
@@ -49,28 +54,28 @@
                     <p x-show="passwordError" class="text-red-600 text-sm mt-1" x-text="passwordError"></p>
                     <a href="#" class="text-sm text-fourth font-bold hover:underline mt-1 inline-block">Forgot Password?</a>
                 </div>
-    
+
                 <button type="submit" class="w-full py-2 bg-fourth text-white font-bold rounded-md hover:bg-green-700" @click.prevent="submitForm">
                     Sign In
                 </button>
-    
+
                 <div class="flex items-center justify-center my-4">
                     <div class="border-t w-[37%] border-gray-500"></div>
                     <span class="text-gray-500 mx-2">Or sign in with</span>
                     <div class="border-t w-[37%] border-gray-500"></div>
                 </div>
-    
+
                 <button type="button" class="flex flex-row justify-center gap-3 w-full py-2 border border-black text-black font-bold rounded-md hover:bg-gray-50">
                     <p>Sign In with</p>
                     <img src="img/google.png" alt="Google" width="25">
                 </button>
-    
-                <p class="text-center text-sm mt-4 text-gray-500">You don’t Have an Account? 
+
+                <p class="text-center text-sm mt-4 text-gray-500">You don’t Have an Account?
                     <a href="{{ route('register') }}" class="text-fourth font-bold hover:underline">Sign Up</a>
                 </p>
             </form>
         </div>
-    
+
         <!-- Right Side -->
         <div class="bg-third w-[45%] hidden md:flex md:items-center md:justify-center">
             <div class="text-black flex flex-col gap-36">
@@ -84,7 +89,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         function formHandler() {
             return {
@@ -94,46 +99,46 @@
                 passwordError: '',
                 internalError: false,
                 showPassword: false,
-    
+
                 togglePassword() {
                     this.showPassword = !this.showPassword;
                 },
-    
+
                 validateIdentifier(value) {
                     const regex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$|^[a-zA-Z0-9_-]{3,16}$/;
                     return regex.test(value);
                 },
-    
+
                 validatePassword(value) { //tergantung dari BE nanti gimana
                     const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
                     return regex.test(value);
                 },
-    
+
                 submitForm() {
                     this.identifierError = '';
                     this.passwordError = '';
                     this.internalError = false;
-    
+
                     if (this.identifier === '') {
                         this.identifierError = 'Email or username tidak boleh kosong.';
                         return;
                     }
-    
+
                     if (!this.validateIdentifier(this.identifier)) {
                         this.identifierError = 'Email or username tidak valid.';
                         return;
                     }
-    
+
                     if (this.password === '') {
                         this.passwordError = 'Password tidak boleh kosong.';
                         return;
                     }
-    
+
                     if (!this.validatePassword(this.password)) {
                         this.passwordError = 'Password harus terdiri dari minimal 8 karakter dengan huruf dan angka.';
                         return;
                     }
-    
+
                     // Jika validasi lolos, kirimkan form
                     document.querySelector('form').submit();
                 }
