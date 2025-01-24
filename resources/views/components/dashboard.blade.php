@@ -1,3 +1,5 @@
-<div>
-    <!-- Act only according to that maxim whereby you can, at the same time, will that it should become a universal law. - Immanuel Kant -->
-</div>
+<h1>Ini Dashboard</h1>
+<form action="{{ route('logout.submit') }}" method="POST">
+    @csrf
+    <button type="submit">Logout</button>
+</form>
