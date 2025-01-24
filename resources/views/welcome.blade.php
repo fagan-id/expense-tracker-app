@@ -37,8 +37,8 @@
                   <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-black hover:bg-fourth">Home</a>
                   <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-black hover:bg-fourth">About</a>
                   <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-black hover:bg-fourth">Contact</a>
-                  <a href="#" class="rounded-md bg-primary px-6 py-2 text-sm font-medium text-black hover:bg-gray-200">Login</a>
-                  <a href="#" class="rounded-md bg-gray-700 px-6 py-2 text-sm font-medium text-primary hover:bg-gray-500 ">Sign In</a>
+                  <a href="login" class="rounded-md bg-primary px-6 py-2 text-sm font-medium text-black hover:bg-gray-200">Login</a>
+                  <a href="register" class="rounded-md bg-gray-700 px-6 py-2 text-sm font-medium text-primary hover:bg-gray-500 ">Sign In</a>
                 </div>
               </div>
             </div>
@@ -71,7 +71,7 @@
               <img src="img/main1.png" alt="Aturin1" width="700">
             </div>
             <div class="flex justify-center text-center">
-              <a href="#" class="block rounded-md drop-shadow-lg bg-third px-32 py-4 text-nowrap sm:px-10 sm:py-4 md:text-xl font-medium font-Poppins text-black hover:bg-fourth ">Get Started!</a>
+              <a href="register" class="block rounded-md drop-shadow-lg bg-third px-32 py-4 text-nowrap sm:px-10 sm:py-4 md:text-xl font-medium font-Poppins text-black hover:bg-fourth ">Get Started!</a>
             </div>
           </div>
         </div>
