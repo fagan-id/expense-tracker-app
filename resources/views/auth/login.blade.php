@@ -65,7 +65,7 @@
                     <div class="border-t w-[37%] border-gray-500"></div>
                 </div>
 
-                <button type="button" class="flex flex-row justify-center gap-3 w-full py-2 border border-black text-black font-bold rounded-md hover:bg-gray-50">
+                <button type="button" class="flex flex-row justify-center gap-3 w-full py-2 border border-black text-black font-bold rounded-md hover:bg-gray-50" onclick="window.location.href='/auth/google/redirect'">
                     <p>Sign In with</p>
                     <img src="img/google.png" alt="Google" width="25">
                 </button>

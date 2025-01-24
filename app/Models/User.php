@@ -23,7 +23,9 @@ class User extends Authenticatable
         'email',
         'password',
         'phone_number',
-        'birth_date'
+        'birth_date',
+        'google_id',
+        'email_verified_at'
     ];
 
     /**

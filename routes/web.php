@@ -1,12 +1,18 @@
 <?php
 
-use App\Http\Controllers\AuthRegisterController;
-use App\Http\Controllers\BudgetController;
-use App\Http\Controllers\LoginController;
+use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
+use Laravel\Socialite\Facades\Socialite;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\AuthRegisterController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\wAuthRegisterController;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 // Welcome Navigation
 Route::view('/home', 'home')->name('home');
@@ -47,3 +53,7 @@ Route::controller(BudgetController::class)->group(function () {
     // TBA
 });
 
+
+// Google Login
+Route::get('/auth/google/redirect',[GoogleAuthController::class, 'redirect']);
+Route::get('/auth/google/callback',[GoogleAuthController::class, 'callback']);
