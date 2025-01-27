@@ -15,6 +15,13 @@
             <form action="{{ route('login.submit') }}" method="POST" class="w-full md:w-[80%] space-y-4" x-data="formHandler()">
                 @csrf
 
+                {{-- Session Messages --}}
+                @if (session('status'))
+                    <div class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded-md">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
                 {{-- <!-- Flash Error: Internal Modal -->
                 <div x-show="internalError" class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded-md">
                     Gagal login, coba lagi!
@@ -52,7 +59,7 @@
                         </button>
                     </div>
                     <p x-show="passwordError" class="text-red-600 text-sm mt-1" x-text="passwordError"></p>
-                    <a href="#" class="text-sm text-fourth font-bold hover:underline mt-1 inline-block">Forgot Password?</a>
+                    <a href="{{ route('password.request') }}" class="text-sm text-fourth font-bold hover:underline mt-1 inline-block">Forgot Password?</a>
                 </div>
 
                 <button type="submit" class="w-full py-2 bg-fourth text-white font-bold rounded-md hover:bg-green-700" @click.prevent="submitForm">

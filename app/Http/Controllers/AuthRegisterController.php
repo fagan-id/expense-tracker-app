@@ -117,6 +117,6 @@ class AuthRegisterController extends Controller
         $request->session()->invalidate(); // Invalidate the session
         $request->session()->regenerateToken(); // Regenerate the CSRF token
 
-        return redirect('/login');
+        return redirect('/');
     }
 }
