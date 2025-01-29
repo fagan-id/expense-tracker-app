@@ -1,3 +1,5 @@
-<div>
-    <!-- Happiness is not something readymade. It comes from your own actions. - Dalai Lama -->
-</div>
+<x-layout>
+    <div class="bg-red-400">
+        ini settings
+    </div>
+</x-layout>

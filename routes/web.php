@@ -33,6 +33,7 @@ Route::controller(AuthRegisterController::class)->group(function () {
 
 Route::controller(TransactionsController::class)->group(function () {
     // View for Forms
+    Route::get('/transactions/form', 'form')->name('transactions.form');
     ///TBA
 
 
@@ -44,6 +45,8 @@ Route::controller(TransactionsController::class)->group(function () {
 });
 
 Route::controller(BudgetController::class)->group(function () {
-    // TBA
+    // Handle Input Request
+    Route::patch('/budget/update/{id}', 'update')->name('budget.update');
+    Route::post('/budget/store', 'store')->name('budget.store'); // Tambahkan Route Store
 });
 

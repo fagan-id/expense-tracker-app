@@ -25,6 +25,11 @@ class Transactions extends Model
         'date' => 'datetime'
     ];
 
+    public function getTimeAttribute()
+    {
+        return $this->date->format('H:i:s'); // Mengambil bagian waktu dari date
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

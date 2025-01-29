@@ -34,13 +34,13 @@ class BudgetController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $fields = $request->validate([
-            'monthly_limit' => 'required|numeric',
+            'monthly_limit' => 'required|numeric|min:0',
         ]);
 
-        // Get the current month and year
         $month = now()->month;
         $year = now()->year;
 
+        // Cek apakah user sudah memiliki budget bulan ini
         $existingBudget = $request->user()->budgets()
             ->where('month', $month)
             ->where('year', $year)
@@ -48,27 +48,24 @@ class BudgetController extends Controller implements HasMiddleware
 
         if ($existingBudget) {
             return response()->json([
-                'message' => "A budget for this month already exists. Please use the update method!",
+                'success' => false,
+                'message' => "Budget bulan ini sudah ada. Silakan gunakan update!",
             ], 400);
         }
 
-        // Add the month and year to the fields
+        // Simpan Budget Baru
         $fields['month'] = $month;
         $fields['year'] = $year;
 
-        // if($request->user()->budgets){
-        //     return ['message' => "Already Created a Budget for This Month, Please Use Update!"];
-        // }
+        $budget = $request->user()->budgets()->create($fields);
 
-
-        $budgets = $request->user()->budgets()->create($fields);
-
-
-        return [
-            'message' => "Succesfully Created A Limit For This Month!",
-            'budget' => $budgets,
-            ];
+        return response()->json([
+            'success' => true,
+            'message' => "Budget berhasil disimpan!",
+            'budget' => $budget
+        ]);
     }
+
 
     /**
      * Display the specified resource.
@@ -84,17 +81,19 @@ class BudgetController extends Controller implements HasMiddleware
      */
     public function update(Request $request, $id)
     {
-        $budget = Budget::findOrFail($id);
-        Gate::authorize('changeBudget', $budget);
+        $budget = Budget::find($id);
 
+        if (!$budget) {
+            return response()->json(['success' => false, 'message' => 'Budget belum tersedia untuk bulan ini. Silakan tambahkan terlebih dahulu.'], 404);
+        }
 
-        $fields = $request->validate([
-            'monthly_limit' => 'required|numeric'
+        $validated = $request->validate([
+            'monthly_limit' => 'required|numeric|min:0'
         ]);
 
-        $budget->update($fields);
+        $budget->update(['monthly_limit' => $validated['monthly_limit']]);
 
-        return ["message" => "Succesfully Updated Budgets for this Month!",
-        "budget" => $budget];
+        return response()->json(['success' => true, 'message' => 'Budget berhasil diperbarui!', 'new_limit' => $budget->monthly_limit]);
     }
+
 }

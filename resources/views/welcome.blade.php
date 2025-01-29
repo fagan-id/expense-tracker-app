@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     @vite('resources/css/app.css')
     <script src="//unpkg.com/alpinejs" defer></script>
-    <title>Document</title>
+    <title>Aturin | Welcoming 💖</title>
 </head>
 <body>
     <nav class="bg-third fixed left-0 top-0 w-full z-50 drop-shadow-lg" x-data="{ isOpen: false }" >
