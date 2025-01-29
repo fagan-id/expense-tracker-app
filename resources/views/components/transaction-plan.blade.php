@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="min-h-screen p-6">
+    <div class="min-h-screen p-6 font-Poppins">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">Transaction Plan</h1>

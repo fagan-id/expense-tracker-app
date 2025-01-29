@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div class="max-w-7xl font-Poppins mx-auto p-6 bg-white rounded-lg shadow-md">
         <h2 class="text-2xl font-bold mb-4">
             {{ request('type') === 'income' ? 'Form Pemasukan' : 'Form Pengeluaran' }}
         </h2>
@@ -36,7 +36,7 @@
                 <input type="date" name="date" class="w-full p-2 border rounded" required>
             </div>
             
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded">
+            <button type="submit" class="w-full bg-fourth text-black py-2 px-4 rounded">
                 {{ request('type') === 'income' ? 'Submit Pemasukan' : 'Submit Pengeluaran' }}
             </button>
         </form>
