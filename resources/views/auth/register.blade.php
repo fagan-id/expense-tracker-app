@@ -16,9 +16,14 @@
             <form method="POST" action="{{ route('register.submit') }}" class="w-full md:w-[80%] space-y-4" x-data="registerHandler()">
                 @csrf
 
-                <!-- Flash Error -->
+                {{-- <!-- Flash Error -->
                 <div x-show="internalError" class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded-md">
                     Gagal mendaftar, periksa input Anda!
+                </div> --}}
+
+                <!-- Flash Error: Internal Modal -->
+                <div x-show="{{ $errors->has('error') ? 'true' : 'false' }}" class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded-md">
+                    {{ $errors->first('error') }}
                 </div>
 
                 <!-- Full Name -->

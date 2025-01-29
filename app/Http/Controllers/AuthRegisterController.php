@@ -11,31 +11,47 @@ class AuthRegisterController extends Controller
 {
     public function register(Request $request)
     {
-        $fields = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed',
-            'phone_number' => 'nullable|string',
-            'birth_date' => 'required|date',
-        ]);
-
-        $user = User::create($fields);
-
-        $token = $user->createToken($request->name);
-
-
-        // Api Handling
-        if ($request->expectsJson()) {
-            // API response
-            return response()->json([
-                'user' => $user,
-                'token' => $token->plainTextToken,
+        try {
+            $fields = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|confirmed',
+                'phone_number' => 'nullable|string',
+                'birth_date' => 'required|date',
             ]);
+
+            $user = User::create($fields);
+
+            $token = $user->createToken($request->name);
+
+
+            // Api Handling
+            if ($request->expectsJson()) {
+                // API response
+                return response()->json([
+                    'user' => $user,
+                    'token' => $token->plainTextToken,
+                ]);
+            }
+
+            // Web app: Authenticate and redirect
+            Auth::login($user);
+            return redirect()->intended('/dashboard');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            // Handle Api Request
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Validation failed!',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+
+            // Web App
+            return back()->withErrors(['error' => 'Gagal mendaftar, periksa input Anda!']);
         }
 
-        // Web app: Authenticate and redirect
-        Auth::login($user);
-        return redirect()->intended('/dashboard');
     }
 
     public function login(Request $request)
@@ -59,7 +75,7 @@ class AuthRegisterController extends Controller
             }
 
             // Web app: Redirect back with error
-            return back()->withErrors(['email' => 'The provided credentials are incorrect!']);
+            return back()->withErrors(['error' => 'The provided credentials are incorrect!']);
         }
 
         $token = $user->createToken($user->name);
@@ -101,6 +117,6 @@ class AuthRegisterController extends Controller
         $request->session()->invalidate(); // Invalidate the session
         $request->session()->regenerateToken(); // Regenerate the CSRF token
 
-        return redirect('/login');
+        return redirect('/');
     }
 }
