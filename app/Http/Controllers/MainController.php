@@ -53,7 +53,13 @@ class MainController
             // Menghitung total uang bulan ini (sisa uang bulan ini)
             $total_Money = $totalIncome - $totalExpense;
 
-            return view('dashboard',compact('transactions', 'budget'));
+            return view('components.dashboard', compact(
+                'transactions', 
+                'totalIncome', 
+                'totalExpense', 
+                'monthlyLimit', 
+                'total_Money'
+            ));
         }
         return redirect()->route('login');
     }
