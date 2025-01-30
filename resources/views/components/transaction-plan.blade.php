@@ -4,9 +4,17 @@
             isEditing: false,
             newLimit: initialLimit,
             budgetId: budgetId,
+            showMessage: false,
+            message: '',
 
             formatRupiah(value) {
                 return new Intl.NumberFormat('id-ID').format(value);
+            },
+
+            showPopup(msg) {
+                this.message = msg;
+                this.showMessage = true;
+                setTimeout(() => this.showMessage = false, 3000); // Otomatis hilang setelah 3 detik
             },
 
             updateLimit() {
@@ -15,49 +23,28 @@
                     return;
                 }
 
-                // Jika Budget Belum Ada, Buat Baru (POST)
-                if (!this.budgetId || this.budgetId === 'null') {
-                    fetch('/budget/store', {  // Fix URL string
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ monthly_limit: this.newLimit })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Budget berhasil disimpan!');
-                            this.budgetId = data.budget.id; // Simpan ID baru
-                            this.isEditing = false;
-                        } else {
-                            alert(data.message);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                const url = this.budgetId ? `/budget/update/${this.budgetId}` : '/budget/store';
+                const method = this.budgetId ? 'PATCH' : 'POST';
 
-                // Jika Budget Sudah Ada, Update (PATCH)
-                } else {
-                    fetch(`/budget/update/${this.budgetId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ monthly_limit: this.newLimit })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Budget berhasil diperbarui!');
-                            this.isEditing = false;
-                        } else {
-                            alert(data.message);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                }
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ monthly_limit: this.newLimit })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.showPopup(data.message);
+                        this.budgetId = data.budget ? data.budget.id : this.budgetId;
+                        this.isEditing = false;
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
             }
         };
     }
@@ -65,6 +52,12 @@
 
 <x-layout>
     <div class="min-h-screen p-1 md:p-6 font-Poppins">
+        <!-- Popup Notifikasi -->
+        <div x-data="{ showMessage: false, message: '' }" x-show="showMessage" class="fixed top-5 right-5 bg-third text-black px-4 py-2 rounded-md shadow-md" x-transition>
+            <span x-text="message"></span>
+            <button @click="showMessage = false" class="ml-2 px-2 py-1 bg-gray-200 text-black rounded">Tutup</button>
+        </div>
+
         <!-- Header -->
         <div class="flex flex-row justify-between items-center mb-4 md:mb-6">
             <h1 class="text-xl md:text-2xl font-bold mb-2 md:mb-0">Transaction Plan</h1>
