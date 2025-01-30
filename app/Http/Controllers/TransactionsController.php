@@ -30,6 +30,20 @@ class TransactionsController extends Controller implements HasMiddleware
         return Transactions::all();
     }
 
+    public function form(Request $request)
+    {
+        $incomeTransactions = Transactions::where('type', 'income')->orderBy('date', 'desc')->get();
+        $expenseTransactions = Transactions::where('type', 'expense')->orderBy('date', 'desc')->get();
+
+        return view('components.form-transaction', [
+            'type' => $request->query('type'),
+            'incomeTransactions' => $incomeTransactions,
+            'expenseTransactions' => $expenseTransactions,
+        ]);
+    }
+
+
+
     /**
      * Store a newly created resource in storage.
      */
