@@ -7,7 +7,7 @@
         </button>
         <div class="flex flex-row items-center gap-3 justify-center px-2">
             <h1 class="font-Poppins text-base font-semibold text-black"> {{ Auth::check() ? Auth::user()->name : 'Guest' }}</h1>
-            <img src="{{ asset('img/UserIcon.png') }}" alt="" width="30">
+            <img src="https://i.pravatar.cc/80" alt="Profile" class="w-[2rem] h-[2rem] rounded-full">
         </div>
     </div>
     <div x-show="isOpen" class="mt-2 rounded-lg p-2 font-medium font-Poppins">
@@ -25,12 +25,12 @@
 
 {{-- ukuran layar lebih besar dari sm (tab -> desktop) --}}
 <nav class="hidden sm:flex bg-fourth h-[5%] sm:h-screen w-screen sm:w-[20%] shadow-lg  justify-center items-center font-Poppins">
-    <div class="flex flex-row items-center sm:items-stretch sm:flex-col sm:w-[90%] sm:h-[95%]">
+    <div class="flex flex-row items-center sm:items-stretch sm:flex-col sm:w-[90%] sm:h-[95%] mt-6">
         <!-- User Info -->
         <div class="relative flex flex-col h-auto transition-all duration-300" id="userInfo">
-            <div class="flex flex-row items-center gap-3 px-1 h-[90%]">
-                <img src="img/UserIcon.png" alt="User Icon" width="50">
-                <p class="text-wrap w-[50%] sm:hidden md:flex"> {{ Auth::check() ? Auth::user()->name : 'Guest' }}</p>
+            <div class="flex flex-row items-center gap-2 px-1 h-[90%]">
+                <img src="https://i.pravatar.cc/80" alt="Profile" class="w-[3rem] h-[3rem] rounded-full">
+                <p class="text-wrap w-[60%] sm:hidden md:flex"> {{ Auth::check() ? Auth::user()->name : 'Guest' }}</p>
                 <!-- Tombol Toggle Menu -->
                 <button id="toggleMenu" class="focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 hidden sm:flex">
@@ -44,7 +44,7 @@
                 </svg>
             </div>
             <!-- Dropdown Menu Logout -->
-            <div id="dropdownMenu" class="absolute left-0 top-[50%] mt-1 w-full bg-third shadow-md rounded-md overflow-hidden transition-all duration-300 opacity-0 scale-y-0 origin-top">
+            <div id="dropdownMenu" class="absolute left-0 top-[50%] mt-1 h-10 w-full bg-third shadow-md rounded-md overflow-hidden transition-all duration-300 opacity-0 scale-y-0 origin-top">
                 <form action="{{ route('logout.submit') }}" method="POST">
                     @csrf
                     <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>

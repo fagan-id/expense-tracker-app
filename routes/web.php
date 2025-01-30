@@ -25,7 +25,7 @@ Route::view('/','welcome')->middleware('guest')->name('welcome');
 // Main Navigation
 Route::get('/dashboard',[MainController::class,'index'])->name('dashboard');
 Route::get('/transactions',[MainController::class,'transactions'])->name('transactions');
-Route::get('/settings',[MainController::class,'settings'])->name('transactions');
+Route::get('/settings',[MainController::class,'settings'])->name('settings');
 
 
 Route::get('/api/chart-data', [MainController::class, 'chartData']);

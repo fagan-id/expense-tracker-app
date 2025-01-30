@@ -20,45 +20,44 @@ class MainController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (Auth::check()) {
             $user = Auth::user();
+            $monthYear = $request->query('month_year', now()->format('Y-m'));
+            $selectedMonth = date('m', strtotime($monthYear));
+            $selectedYear = date('Y', strtotime($monthYear));
 
-            // Mengambil semua transaksi user
-            $transactions = $user->transactions()->orderBy('date', 'desc')->get();
+            // Mengambil transaksi berdasarkan bulan dan tahun yang dipilih
+            $transactions = $user->transactions()
+                ->whereMonth('date', $selectedMonth)
+                ->whereYear('date', $selectedYear)
+                ->orderBy('date', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
 
-            // Menghitung total pemasukan (income) bulan ini
             $totalIncome = $user->transactions()
                 ->where('type', 'income')
-                ->whereMonth('date', now()->month)
-                ->whereYear('date', now()->year)
+                ->whereMonth('date', $selectedMonth)
+                ->whereYear('date', $selectedYear)
                 ->sum('amount');
 
-            // Menghitung total pengeluaran (expense) bulan ini
             $totalExpense = $user->transactions()
                 ->where('type', 'expense')
-                ->whereMonth('date', now()->month)
-                ->whereYear('date', now()->year)
+                ->whereMonth('date', $selectedMonth)
+                ->whereYear('date', $selectedYear)
                 ->sum('amount');
 
-            // Mengambil batas pengeluaran bulan ini dari BudgetController
             $budget = $user->budgets()
-                ->where('month', now()->month)
-                ->where('year', now()->year)
+                ->where('month', $selectedMonth)
+                ->where('year', $selectedYear)
                 ->first();
 
             $monthlyLimit = $budget ? $budget->monthly_limit : 0;
-
-            // Menghitung total uang bulan ini (sisa uang bulan ini)
             $total_Money = $totalIncome - $totalExpense;
 
             return view('components.dashboard', compact(
-                'transactions',
-                'totalIncome',
-                'totalExpense',
-                'monthlyLimit',
-                'total_Money'
+                'transactions', 'totalIncome', 'totalExpense', 'monthlyLimit', 'total_Money'
             ));
         }
         return redirect()->route('login');
@@ -175,46 +174,71 @@ class MainController
         ]);
     }
 
-    public function transactions()
+    public function transactions(Request $request)
     {
         if (Auth::check()) {
+            $selectedMonthYear = $request->input('month_year', now()->format('Y-m'));
+            $selectedDate = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonthYear);
+            $month = $selectedDate->month;
+            $year = $selectedDate->year;
+
             $incomeTransactions = Auth::user()->transactions()
                 ->where('type', 'income')
-                ->orderBy('date', 'desc')
-                ->get();
+                ->whereMonth('date', $month)
+                ->whereYear('date', $year)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
 
             $expenseTransactions = Auth::user()->transactions()
                 ->where('type', 'expense')
-                ->orderBy('date', 'desc')
-                ->get();
+                ->whereMonth('date', $month)
+                ->whereYear('date', $year)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
 
             $totalIncome = $incomeTransactions->sum('amount');
             $totalExpense = $expenseTransactions->sum('amount');
             $totalBalance = $totalIncome - $totalExpense;
 
-            $budget = Auth::user()->budgets()->where('month', now()->month)->where('year', now()->year)->first();
+            $budget = Auth::user()->budgets()
+                ->where('month', $month)
+                ->where('year', $year)
+                ->first();
 
-            $isOverLimit = false;
-            if ($budget && $totalExpense > $budget->monthly_limit) {
-                $isOverLimit = true;
-            }
+                // dd($budget);
+
+            $isOverLimit = $budget && $totalExpense > $budget->monthly_limit;
 
             return view('components.transaction-plan', [
                 'incomeTransactions' => $incomeTransactions,
                 'expenseTransactions' => $expenseTransactions,
                 'totalBalance' => $totalBalance,
                 'budget' => $budget,
-                'isOverLimit' => $isOverLimit
+                'isOverLimit' => $isOverLimit,
+                'selectedMonthYear' => $selectedMonthYear
             ]);
         }
 
         return redirect()->route('login');
     }
 
-
     public function settings()
     {
-        //TBA
-        return view('components.settings');
+        $user = auth()->user();
+
+        // Hitung total income dan total expense
+        $totalIncome = $user->transactions()->where('type', 'income')->sum('amount');
+        $totalExpense = $user->transactions()->where('type', 'expense')->sum('amount');
+
+        // Daftar pertanyaan FAQ
+        $faqs = [
+            "What is Aturin ?" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "Lorem ipsum dolor sit amet ?" => null,
+            "What is sigma boy?" => null,
+            "What is Mahasigma ?" => null
+        ];
+
+        return view('components.settings', compact('user', 'totalIncome', 'totalExpense', 'faqs'));
     }
+
 }

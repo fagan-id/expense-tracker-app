@@ -57,19 +57,22 @@ class TransactionsController extends Controller implements HasMiddleware
             'description' => 'nullable|string|max:255',
         ]);
 
-        $post = $request->user()->transactions()->create($fields);
+        try {
+            $post = $request->user()->transactions()->create($fields);
 
-        // Set flash message
-        $message = $fields['type'] === 'income' ? 'Income successfully added' : 'Expense successfully added';
-        session()->flash('message', $message);
+            $message = $fields['type'] === 'income' ? 'Income successfully added' : 'Expense successfully added';
 
-        // Handle API Request
-        if ($request->expectsJson()) {
-            return ['transactions' => $post, 'message' => $message];
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'transaction' => $post
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add transaction. Please try again.',
+            ], 500);
         }
-
-        // View
-        return redirect()->back();
     }
 
     /**

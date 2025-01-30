@@ -1,27 +1,32 @@
 <x-layout>
-    <header class="font-Poppins my-10">
+    
+    <header class="font-Poppins mt-6 mb-2 mx-2">
+         <!-- Tombol kembali ke halaman components.transactions-plan -->
+         <div class="mb-4">
+            <a href="{{ route('transactions') }}" class="text-blue-600 hover:underline">Kembali ke Rencana Transaksi</a>
+        </div>
         <h2 class="text-2xl font-semibold mb-4">
             {{ request('type') === 'income' ? 'Form Pemasukan' : 'Form Pengeluaran' }}
         </h2>
         <img src="/img/LineHeader.png" alt="" width="30" height="20">
     </header>
     
-    <div class="max-w-7xl font-Poppins mx-auto p-6 bg-white rounded-lg shadow-md">
-        <h2 class="text-2xl font-normal mb-6">
-            Isi Form Berikut ini!
-        </h2>
-        <form method="POST" action="{{ route('transactions.store') }}" class="px-4">
+    <div x-data="transactionForm()" class="max-w-7xl font-Poppins mx-auto p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-normal mb-6">Isi Form Berikut ini!</h2>
+
+        <!-- Form -->
+        <form @submit.prevent="submitForm" class="px-4">
             @csrf
-            <input type="hidden" name="type" value="{{ request('type') }}">
-            
+            <input type="hidden" name="type" x-model="form.type">
+
             <div class="mb-4">
                 <label class="block text-gray-700">Transaction</label>
-                <input type="text" name="description" class="w-full p-2 border rounded" placeholder="Enter transaction name" required>
+                <input type="text" x-model="form.description" class="w-full p-2 border rounded" placeholder="Enter transaction name" required>
             </div>
-            
+
             <div class="mb-4">
                 <label class="block text-gray-700">Category</label>
-                <select name="category" class="w-full p-2 border rounded" required>
+                <select x-model="form.category" class="w-full p-2 border rounded" required>
                     <option value="Transportation">Transportation</option>
                     <option value="Entertainment">Entertainment</option>
                     <option value="Utilities">Utilities</option>
@@ -32,42 +37,76 @@
                     <option value="Others">Others</option>
                 </select>
             </div>
-            
+
             <div class="mb-4">
                 <label class="block text-gray-700">Amount</label>
-                <input type="number" name="amount" class="w-full p-2 border rounded" placeholder="Enter amount" required>
+                <input type="number" x-model="form.amount" class="w-full p-2 border rounded" placeholder="Enter amount" required>
             </div>
-            
+
             <div class="mb-4">
                 <label class="block text-gray-700">Date</label>
-                <input type="date" name="date" class="w-full p-2 border rounded" required>
+                <input type="date" x-model="form.date" class="w-full p-2 border rounded" required>
             </div>
-            
+
             <button type="submit" class="w-full bg-fourth text-black py-2 px-4 rounded">
                 {{ request('type') === 'income' ? 'Submit Pemasukan' : 'Submit Pengeluaran' }}
             </button>
         </form>
-    </div>
 
-    <!-- Modal -->
-    <div id="successModal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
-        <div class="flex flex-col justify-center bg-white p-8 rounded-lg shadow-lg w-1/3">
-            <h2 class="text-3xl font-semibold mb-4">Success</h2>
-            <p id="modalMessage" class="text-lg"></p>
-            <button onclick="closeModal()" class="mt-4 bg-blue-500 text-white py-2 px-6 rounded">Close</button>
+        <!-- Pop-up Notification -->
+        <div x-show="message" class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg"
+            :class="success ? 'bg-third text-black' : 'bg-red-500 text-white'" x-transition>
+            <p x-text="message" class="text-lg"></p>
+            <button @click="message = ''" class="mt-2 bg-gray-300 text-black py-1 px-3 rounded">Close</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            @if(session('message'))
-                document.getElementById('modalMessage').innerText = "{{ session('message') }}";
-                document.getElementById('successModal').classList.remove('hidden');
-            @endif
-        });
+        function transactionForm() {
+            return {
+                form: {
+                    type: '{{ request("type") }}',
+                    description: '',
+                    category: '',
+                    amount: '',
+                    date: ''
+                },
+                message: '',
+                success: false,
+                
+                async submitForm() {
+                    try {
+                        let response = await fetch("{{ route('transactions.store') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+                            },
+                            body: JSON.stringify(this.form)
+                        });
 
-        function closeModal() {
-            document.getElementById('successModal').classList.add('hidden');
+                        let result = await response.json();
+
+                        if (result.success) {
+                            this.message = result.message;
+                            this.success = true;
+                            this.resetForm();
+                        } else {
+                            throw new Error(result.message);
+                        }
+                    } catch (error) {
+                        this.message = error.message || "Something went wrong!";
+                        this.success = false;
+                    }
+                },
+
+                resetForm() {
+                    this.form.description = '';
+                    this.form.category = '';
+                    this.form.amount = '';
+                    this.form.date = '';
+                }
+            };
         }
     </script>
 </x-layout>
