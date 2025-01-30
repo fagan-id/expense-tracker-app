@@ -1,4 +1,4 @@
-<x-layout>
+ <x-layout>
     <div class="bg-gray-100 min-h-screen p-6 font-Poppins">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
@@ -70,7 +70,7 @@
                                 {{ $transaction->type == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                             </td>
                             <td class="py-2 px-4">{{ $transaction->date->format('d F Y') }}</td>
-                            <td class="py-2 px-4">{{ $transaction->time }}</td>
+                            <td class="py-2 px-4">{{ $transaction->created_at->format('H:i:s') }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -84,7 +84,7 @@
             let ctx = document.getElementById("incomeExpenseChart").getContext("2d");
             let chartFilter = document.getElementById("chartFilter");
             let incomeExpenseChart;
-    
+
             function fetchData(filter) {
                 fetch(`/api/chart-data?filter=${filter}`)
                     .then(response => response.json())
@@ -127,11 +127,11 @@
                         });
                     });
             }
-    
+
             chartFilter.addEventListener("change", function() {
                 fetchData(this.value);
             });
-    
+
             fetchData("daily");
         });
     </script>

@@ -26,7 +26,7 @@ class MainController
             $user = Auth::user();
 
             // Mengambil semua transaksi user
-            $transactions = $user->transactions()->orderBy('date', 'desc')->orderBy('time', 'desc')->get();
+            $transactions = $user->transactions()->orderBy('date', 'desc')->get();
 
             // Menghitung total pemasukan (income) bulan ini
             $totalIncome = $user->transactions()

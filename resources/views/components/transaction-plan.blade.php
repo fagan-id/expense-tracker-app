@@ -21,9 +21,9 @@
                     Rp {{ number_format($totalBalance, 0, ',', '.') }}
                 </p>
             </div>
-            <div x-data="budgetComponent({{ $budget->id ?? 'null' }}, {{ $budget->monthly_limit ?? 0 }})" 
+            <div x-data="budgetComponent({{ $budget->id ?? 'null' }}, {{ $budget->monthly_limit ?? 0 }})"
                 class="bg-yellow-100 p-4 rounded-lg shadow flex justify-between items-center {{ $isOverLimit ? 'border-red-500' : '' }}">
-               
+
                 <div>
                     <p class="text-gray-500">Batas Pengeluaran Bulan ini</p>
                     <div x-show="!isEditing">
@@ -32,13 +32,13 @@
                         </p>
                     </div>
                     <div x-show="isEditing" @click.away="isEditing = false">
-                        <input type="number" x-model="newLimit" 
+                        <input type="number" x-model="newLimit"
                             @keydown.enter="updateLimit()"
-                            class="border rounded-md px-3 py-2 bg-yellow-100 w-32" 
+                            class="border rounded-md px-3 py-2 bg-yellow-100 w-32"
                             placeholder="Masukkan limit baru" />
                     </div>
                 </div>
-            
+
                 <button @click="isEditing = !isEditing" class="p-2 rounded-full shadow">
                     <i class="fa fa-edit text-black" style="font-size:1.2rem"></i>
                 </button>
@@ -73,7 +73,7 @@
                             <td>{{ $transaction->category }}</td>
                             <td class="text-green-500">+Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
                             <td>{{ $transaction->date->format('d F Y') }}</td>
-                            <td>{{ $transaction->time }}</td>
+                            <td>{{ $transaction->created_at->format('H:i:s') }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -116,25 +116,25 @@
                 </table>
             </div>
         </div>
-    </div> 
-    
+    </div>
+
     <script>
         function budgetComponent(budgetId, initialLimit) {
             return {
                 isEditing: false,
                 newLimit: initialLimit,
                 budgetId: budgetId,
-                
+
                 formatRupiah(value) {
                     return new Intl.NumberFormat('id-ID').format(value);
                 },
-    
+
                 updateLimit() {
                     if (this.newLimit < 0 || this.newLimit === '') {
                         alert('Masukkan angka yang valid untuk limit bulanan.');
                         return;
                     }
-    
+
                     // Jika Budget Belum Ada, Buat Baru (POST)
                     if (!this.budgetId || this.budgetId === 'null') {
                         fetch(`/budget/store`, {
@@ -156,7 +156,7 @@
                             }
                         })
                         .catch(error => console.error('Error:', error));
-    
+
                     // Jika Budget Sudah Ada, Update (PATCH)
                     } else {
                         fetch(`/budget/update/${this.budgetId}`, {
