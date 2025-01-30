@@ -10,6 +10,7 @@
         </h2>
         <img src="/img/LineHeader.png" alt="" width="30" height="20">
     </header>
+    <hr class="border-gray-300 mb-4 md:mb-6">
     
     <div x-data="transactionForm()" class="max-w-7xl font-Poppins mx-auto p-6 bg-white rounded-lg shadow-md">
         <h2 class="text-2xl font-normal mb-6">Isi Form Berikut ini!</h2>
