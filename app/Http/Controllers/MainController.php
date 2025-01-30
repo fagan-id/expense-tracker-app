@@ -24,22 +24,37 @@ class MainController
     {
         if (Auth::check()) {
             $transactions = Auth::user()->transactions;
-            $budget =  Auth::user()->transactions;
+            $totalIncome = $transactions->where('type','income')->sum('amount');
+            $totalExpense = $transactions->where('type','expense')->sum('amount');
+            $budget =  Auth::user()->budgets->first();
 
-            return view('components.dashboard',compact('transactions', 'budget'));
+            //TBA for Insights
+
+            return view('components.dashboard',compact('transactions', 'budget','totalIncome','totalExpense'));
         }
         return redirect()->route('login');
     }
 
     public function transactions()
     {
-        //TBA
-        return view('transaction-plan');
+        $transactions = Auth::user()->transactions;
+
+        $income = $transactions->where('type','income');
+        $expense = $transactions->where('type','expense');
+
+        $totalIncome = $transactions->where('type','income')->sum('amount');
+        $totalExpense = $transactions->where('type','expense')->sum('amount');
+        $totalMoney = $totalIncome-$totalExpense; //TBA
+
+        $budget =  Auth::user()->budgets->first();
+
+
+        return view('components.transaction-plan',compact('income','expense','totalIncome','totalExpense','totalMoney','budget'));
     }
 
     public function settings()
     {
-        //TBA
-        return view('settings');
+        $user = Auth::user();
+        return view('components.settings',compact('user'));
     }
 }

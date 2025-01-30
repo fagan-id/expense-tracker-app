@@ -28,6 +28,7 @@ Route::get('/transactions',[MainController::class,'transactions'])->name('transa
 Route::get('/settings',[MainController::class,'settings'])->name('transactions');
 
 
+// Authentication
 Route::controller(AuthRegisterController::class)->group(function () {
     // Authentication View
     Route::view('/login', 'auth.login')->middleware('guest')->name('login');
@@ -45,9 +46,10 @@ Route::controller(AuthRegisterController::class)->group(function () {
     Route::post('/reset-password',[ResetPasswordController::class,'passwordUpdate'] )->name('password.update');
 });
 
+// Transactions
 Route::controller(TransactionsController::class)->group(function () {
     // View for Forms
-    ///TBA
+    Route::view('/transactions/forms','components.form-transaction')->name('transactions.forms');
 
 
     // Handle Input Request
@@ -57,10 +59,10 @@ Route::controller(TransactionsController::class)->group(function () {
     Route::delete('/transactions/destroy/{id}','delete')->name('transactions.delete');
 });
 
+// Budget
 Route::controller(BudgetController::class)->group(function () {
     // TBA
 });
-
 
 // Google Login
 Route::get('/auth/google/redirect',[GoogleAuthController::class, 'redirect']);

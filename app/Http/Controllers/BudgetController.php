@@ -47,18 +47,17 @@ class BudgetController extends Controller implements HasMiddleware
             ->first();
 
         if ($existingBudget) {
-            return response()->json([
-                'message' => "A budget for this month already exists. Please use the update method!",
-            ], 400);
+            if($request->expectsJson()){
+                return response()->json([
+                    'message' => "A budget for this month already exists. Please use the update method!",
+                ], 400);
+            }
+            return redirect()->back()->withErrors(['errors','A budget for this month already exists. Please use the Update Method!']);
         }
 
         // Add the month and year to the fields
         $fields['month'] = $month;
         $fields['year'] = $year;
-
-        // if($request->user()->budgets){
-        //     return ['message' => "Already Created a Budget for This Month, Please Use Update!"];
-        // }
 
 
         $budgets = $request->user()->budgets()->create($fields);
