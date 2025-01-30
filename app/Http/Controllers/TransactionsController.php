@@ -59,9 +59,13 @@ class TransactionsController extends Controller implements HasMiddleware
 
         $post = $request->user()->transactions()->create($fields);
 
+        // Set flash message
+        $message = $fields['type'] === 'income' ? 'Income successfully added' : 'Expense successfully added';
+        session()->flash('message', $message);
+
         // Handle API Request
         if ($request->expectsJson()) {
-            return ['transactions' => $post];
+            return ['transactions' => $post, 'message' => $message];
         }
 
         // View

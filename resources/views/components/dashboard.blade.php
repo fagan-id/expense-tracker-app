@@ -80,16 +80,23 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             let ctx = document.getElementById("incomeExpenseChart").getContext("2d");
             let chartFilter = document.getElementById("chartFilter");
             let incomeExpenseChart;
-
+    
             function fetchData(filter) {
                 fetch(`/api/chart-data?filter=${filter}`)
                     .then(response => response.json())
                     .then(data => {
                         if (incomeExpenseChart) incomeExpenseChart.destroy();
+    
+                        const maxValue = Math.max(
+                            ...data.income,
+                            ...data.expense,
+                            ...data.limit
+                        );
+    
                         incomeExpenseChart = new Chart(ctx, {
                             type: 'line',
                             data: {
@@ -99,12 +106,14 @@
                                         label: 'Income',
                                         data: data.income,
                                         borderColor: 'green',
+                                        backgroundColor: 'transparent',
                                         fill: false
                                     },
                                     {
                                         label: 'Expense',
                                         data: data.expense,
                                         borderColor: 'red',
+                                        backgroundColor: 'transparent',
                                         fill: false
                                     },
                                     {
@@ -120,20 +129,21 @@
                                 responsive: true,
                                 scales: {
                                     y: {
-                                        beginAtZero: true
+                                        beginAtZero: true,
+                                        max: maxValue + maxValue * 0.1,
                                     }
                                 }
                             }
                         });
                     });
             }
-
-            chartFilter.addEventListener("change", function() {
+    
+            chartFilter.addEventListener("change", function () {
                 fetchData(this.value);
             });
-
+    
             fetchData("daily");
         });
-    </script>
+    </script>        
 </x-layout>
 

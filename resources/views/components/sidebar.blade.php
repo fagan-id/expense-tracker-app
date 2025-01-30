@@ -7,7 +7,7 @@
         </button>
         <div class="flex flex-row items-center gap-3 justify-center px-2">
             <h1 class="font-Poppins text-base font-semibold text-black"> {{ Auth::check() ? Auth::user()->name : 'Guest' }}</h1>
-            <img src="img/UserIcon.png" alt="" width="30">
+            <img src="{{ asset('img/UserIcon.png') }}" alt="" width="30">
         </div>
     </div>
     <div x-show="isOpen" class="mt-2 rounded-lg p-2 font-medium font-Poppins">

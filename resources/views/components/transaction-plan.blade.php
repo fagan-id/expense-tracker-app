@@ -46,74 +46,82 @@
         </div>
 
         <!-- Income Transactions -->
-        <div class="bg-white p-6 rounded-lg shadow mb-6">
+        <div class="bg-white p-6 rounded-lg shadow mb-6 mt-2">
             <div class="flex justify-between mb-4">
-                <h2 class="text-lg font-semibold">Riwayat Pemasukan</h2>
-                <div class="flex gap-2">
-                    <a href="{{ route('transactions.form', ['type' => 'income']) }}" class="bg-green-200 text-green-700 px-3 py-1 rounded-md flex items-center">
-                        <i class="fas fa-plus mr-1"></i> Tambah Pemasukan
-                    </a>
-                </div>
+            <h2 class="text-lg font-semibold">Riwayat Pemasukan</h2>
+            <div class="flex gap-2">
+            <a href="{{ route('transactions.form', ['type' => 'income']) }}" class="bg-green-200 text-green-700 px-3 py-1 rounded-md flex items-center">
+            <i class="fas fa-plus mr-1"></i> Tambah Pemasukan
+            </a>
+            </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left min-w-[600px]">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="py-2">Transaction</th>
-                            <th class="py-2">Category</th>
-                            <th class="py-2">Amount</th>
-                            <th class="py-2">Date</th>
-                            <th class="py-2">Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($incomeTransactions as $transaction)
-                        <tr class="border-b">
-                            <td>{{ $transaction->description }}</td>
-                            <td>{{ $transaction->category }}</td>
-                            <td class="text-green-500">+Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
-                            <td>{{ $transaction->date->format('d F Y') }}</td>
-                            <td>{{ $transaction->created_at->format('H:i:s') }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <table class="w-full text-left min-w-[600px]">
+            <thead>
+            <tr class="border-b">
+                <th class="py-2">Transaction</th>
+                <th class="py-2">Category</th>
+                <th class="py-2">Amount</th>
+                <th class="py-2">Date</th>
+                <th class="py-2">Time</th>
+            </tr>
+            </thead>
+            <tbody>
+            @forelse ($incomeTransactions as $transaction)
+            <tr class="border-b mb-2">
+                <td>{{ $transaction->description }}</td>
+                <td>{{ $transaction->category }}</td>
+                <td class="text-green-500">+Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
+                <td>{{ $transaction->date->format('d F Y') }}</td>
+                <td>{{ $transaction->created_at->format('H:i:s') }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5" class="text-center text-gray-500">Nothing income</td>
+            </tr>
+            @endforelse
+            </tbody>
+            </table>
             </div>
         </div>
 
         <!-- Expense Transactions -->
-        <div class="bg-white p-6 rounded-lg shadow">
+        <div class="bg-white p-6 rounded-lg shadow mt-2">
             <div class="flex justify-between mb-4">
-                <h2 class="text-lg font-semibold">Riwayat Pengeluaran</h2>
-                <div class="flex gap-2">
-                    <a href="{{ route('transactions.form', ['type' => 'expense']) }}" class="bg-green-200 text-green-700 px-3 py-1 rounded-md flex items-center">
-                        <i class="fas fa-plus mr-1"></i> Tambah Pengeluaran
-                    </a>
-                </div>
+            <h2 class="text-lg font-semibold">Riwayat Pengeluaran</h2>
+            <div class="flex gap-2">
+            <a href="{{ route('transactions.form', ['type' => 'expense']) }}" class="bg-green-200 text-green-700 px-3 py-1 rounded-md flex items-center">
+            <i class="fas fa-plus mr-1"></i> Tambah Pengeluaran
+            </a>
+            </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left min-w-[600px]">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="py-2">Transaction</th>
-                            <th class="py-2">Category</th>
-                            <th class="py-2">Amount</th>
-                            <th class="py-2">Date</th>
-                            <th class="py-2">Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($expenseTransactions as $transaction)
-                        <tr class="border-b">
-                            <td>{{ $transaction->description }}</td>
-                            <td>{{ $transaction->category }}</td>
-                            <td class="text-red-500">-Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
-                            <td>{{ $transaction->date->format('d F Y') }}</td>
-                            <td>{{ $transaction->time }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <table class="w-full text-left min-w-[600px]">
+            <thead>
+            <tr class="border-b">
+                <th class="py-2">Transaction</th>
+                <th class="py-2">Category</th>
+                <th class="py-2">Amount</th>
+                <th class="py-2">Date</th>
+                <th class="py-2">Time</th>
+            </tr>
+            </thead>
+            <tbody>
+            @forelse ($expenseTransactions as $transaction)
+            <tr class="border-b mb-2">
+                <td>{{ $transaction->description }}</td>
+                <td>{{ $transaction->category }}</td>
+                <td class="text-red-500">-Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
+                <td>{{ $transaction->date->format('d F Y') }}</td>
+                <td>{{ $transaction->time }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5" class="text-center text-gray-500">Nothing expense</td>
+            </tr>
+            @endforelse
+            </tbody>
+            </table>
             </div>
         </div>
     </div>

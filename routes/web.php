@@ -28,6 +28,9 @@ Route::get('/transactions',[MainController::class,'transactions'])->name('transa
 Route::get('/settings',[MainController::class,'settings'])->name('transactions');
 
 
+Route::get('/api/chart-data', [MainController::class, 'chartData']);
+
+
 // Authentication
 Route::controller(AuthRegisterController::class)->group(function () {
     // Authentication View
