@@ -5,72 +5,19 @@
             let chartFilter = document.getElementById("chartFilter");
             let viewReportButton = document.getElementById("viewReportButton");
             let incomeExpenseChart;
-    
-            function fetchData(filter) {
-                fetch(`/api/chart-data?filter=${filter}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (incomeExpenseChart) incomeExpenseChart.destroy();
-    
-                        const maxValue = Math.max(
-                            ...data.income,
-                            ...data.expense,
-                            ...data.limit
-                        );
-    
-                        incomeExpenseChart = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: data.labels,
-                                datasets: [
-                                    { label: 'Income', data: data.income, borderColor: 'green', backgroundColor: 'transparent', fill: false },
-                                    { label: 'Expense', data: data.expense, borderColor: 'red', backgroundColor: 'transparent', fill: false },
-                                    { label: 'Monthly Limit', data: data.limit, borderColor: 'yellow', borderDash: [5, 5], fill: false }
-                                ]
-                            },
-                            options: {
-                                responsive: true,
-                                scales: {
-                                    y: { beginAtZero: true, max: maxValue + maxValue * 0.1 }
-                                }
-                            }
-                        });
-                    });
-            }
-    
-            chartFilter.addEventListener("change", function () {
-                fetchData(this.value);
-            });
-    
-            viewReportButton.addEventListener("click", function () {
-                const filter = chartFilter.value;
-                window.location.href = `/report?filter=${filter}`;
-            });
-    
-            fetchData("daily");
-        });
-    </script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let ctx = document.getElementById("incomeExpenseChart").getContext("2d");
-            let chartFilter = document.getElementById("chartFilter");
-            let viewReportButton = document.getElementById("viewReportButton");
-            let incomeExpenseChart;
-    
             function fetchData(filter) {
                 fetch(`/api/chart-data?filter=${filter}`)
                     .then(response => response.json())
                     .then(data => {
                         if (incomeExpenseChart) incomeExpenseChart.destroy();
-    
+
                         const maxValue = Math.max(
                             ...data.income,
                             ...data.expense,
                             ...data.limit
                         );
-    
+
                         incomeExpenseChart = new Chart(ctx, {
                             type: 'line',
                             data: {
@@ -90,16 +37,21 @@
                         });
                     });
             }
-    
+
             chartFilter.addEventListener("change", function () {
                 fetchData(this.value);
             });
-    
+
             viewReportButton.addEventListener("click", function () {
                 const filter = chartFilter.value;
-                window.location.href = `/report?filter=${filter}`;
+
+                if (filter === 'monthly' || filter === 'yearly') {
+                    window.location.href = `/report/${filter}`;
+                } else {
+                    alert("Only Monthly and Yearly reports are available.");
+                }
             });
-    
+
             fetchData("daily");
         });
     </script>
@@ -109,16 +61,16 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 relative">
             <h1 class="text-xl md:text-2xl font-bold">Dashboard</h1>
-            <div x-data="{ showDatePicker: false, monthYear: '{{ request('month_year') ? date('F Y', strtotime(request('month_year'))) : now()->format('F Y') }}' }" 
+            <div x-data="{ showDatePicker: false, monthYear: '{{ request('month_year') ? date('F Y', strtotime(request('month_year'))) : now()->format('F Y') }}' }"
                 class="absolute right-0 md:relative md:right-auto mt-0">
                 <button @click="showDatePicker = !showDatePicker" class="bg-third text-black px-3 py-2 md:px-4 md:py-2 rounded-md text-sm md:text-base">
                     <span x-text="monthYear"></span>
                 </button>
                 <div x-show="showDatePicker" @click.away="showDatePicker = false" class="absolute bg-white shadow-md p-2 mt-2 rounded-md z-50 right-0">
                     <form method="GET" action="{{ route('dashboard') }}">
-                        <input type="month" name="month_year" class="border p-2 rounded-md text-sm md:text-base" 
-                            @change="monthYear = new Date($event.target.value + '-01').toLocaleString('en-US', { month: 'long', year: 'numeric' }); 
-                            $event.target.form.submit(); showDatePicker = false" 
+                        <input type="month" name="month_year" class="border p-2 rounded-md text-sm md:text-base"
+                            @change="monthYear = new Date($event.target.value + '-01').toLocaleString('en-US', { month: 'long', year: 'numeric' });
+                            $event.target.form.submit(); showDatePicker = false"
                             value="{{ request('month_year', now()->format('Y-m')) }}">
                     </form>
                 </div>

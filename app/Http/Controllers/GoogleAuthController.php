@@ -25,6 +25,8 @@ class GoogleAuthController extends Controller
                 'name' => $googleUser->name,
                 'email' => $googleUser->email,
                 'password' => Str::password(8),
+                'birth_date' => null,
+                'phone_number' => null,
                 'email_verified_at' => now()
             ]
             );

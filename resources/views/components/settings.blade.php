@@ -22,11 +22,11 @@
                 <div class="py-6 px-8 space-y-4">
                     <div>
                         <h3 class="text-sm font-semibold text-gray-600">Birth Date</h3>
-                        <p class="text-gray-800">{{ $user->birth_date->format('d M Y') }}</p>
+                        <p class="text-gray-800">{{ $user->birth_date ? $user->birth_date->format('d M Y') : '-' }}</p>
                     </div>
                     <div>
                         <h3 class="text-sm font-semibold text-gray-600">Phone Number</h3>
-                        <p class="text-gray-800">{{ $user->phone_number }}</p>
+                        <p class="text-gray-800">{{ $user->phone_number ? $user->phone_number : '-' }}</p>
                     </div>
                     <div>
                         <h3 class="text-sm font-semibold text-gray-600">Total Income</h3>
