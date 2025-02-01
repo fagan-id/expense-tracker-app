@@ -1,60 +1,66 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let ctx = document.getElementById("incomeExpenseChart").getContext("2d");
-            let chartFilter = document.getElementById("chartFilter");
-            let viewReportButton = document.getElementById("viewReportButton");
-            let incomeExpenseChart;
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    let ctx = document.getElementById("incomeExpenseChart").getContext("2d");
+    let chartFilter = document.getElementById("chartFilter");
+    let viewReportButton = document.getElementById("viewReportButton");
+    let monthYearInput = document.querySelector("input[name='month_year']");
+    let incomeExpenseChart;
 
-            function fetchData(filter) {
-                fetch(`/api/chart-data?filter=${filter}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (incomeExpenseChart) incomeExpenseChart.destroy();
+    function fetchData(filter, monthYear) {
+        fetch(`/api/chart-data?filter=${filter}&month_year=${monthYear}`)
+            .then(response => response.json())
+            .then(data => {
+                if (incomeExpenseChart) incomeExpenseChart.destroy();
 
-                        const maxValue = Math.max(
-                            ...data.income,
-                            ...data.expense,
-                            ...data.limit
-                        );
+                const maxValue = Math.max(
+                    ...data.income,
+                    ...data.expense,
+                    ...data.limit
+                );
 
-                        incomeExpenseChart = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: data.labels,
-                                datasets: [
-                                    { label: 'Income', data: data.income, borderColor: 'green', backgroundColor: 'transparent', fill: false },
-                                    { label: 'Expense', data: data.expense, borderColor: 'red', backgroundColor: 'transparent', fill: false },
-                                    { label: 'Monthly Limit', data: data.limit, borderColor: 'yellow', borderDash: [5, 5], fill: false }
-                                ]
-                            },
-                            options: {
-                                responsive: true,
-                                scales: {
-                                    y: { beginAtZero: true, max: maxValue + maxValue * 0.1 }
-                                }
-                            }
-                        });
-                    });
-            }
-
-            chartFilter.addEventListener("change", function () {
-                fetchData(this.value);
+                incomeExpenseChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            { label: 'Income', data: data.income, borderColor: 'green', backgroundColor: 'transparent', fill: false },
+                            { label: 'Expense', data: data.expense, borderColor: 'red', backgroundColor: 'transparent', fill: false },
+                            { label: 'Monthly Limit', data: data.limit, borderColor: 'yellow', borderDash: [5, 5], fill: false }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true, max: maxValue + maxValue * 0.1 }
+                        }
+                    }
+                });
             });
+    }
 
-            viewReportButton.addEventListener("click", function () {
-                const filter = chartFilter.value;
-
-                if (filter === 'monthly' || filter === 'yearly') {
-                    window.location.href = `/report/${filter}`;
-                } else {
-                    alert("Only Monthly and Yearly reports are available.");
-                }
-            });
-
-            fetchData("daily");
+        chartFilter.addEventListener("change", function () {
+            fetchData(this.value, monthYearInput.value);
         });
-    </script>
+
+        monthYearInput.addEventListener("change", function () {
+            fetchData(chartFilter.value, this.value);
+        });
+
+        viewReportButton.addEventListener("click", function () {
+            const filter = chartFilter.value;
+            const monthYear = monthYearInput.value;
+
+            if (filter === 'monthly' || filter === 'yearly') {
+                window.location.href = `/report/${filter}?month_year=${monthYear}`;
+            } else {
+                alert("Only Monthly and Yearly reports are available.");
+            }
+        });
+
+        fetchData("daily", monthYearInput.value);
+    });
+</script>
 
 <x-layout>
     <div class="bg-gray-100 min-h-screen p-4 md:p-6 font-Poppins">

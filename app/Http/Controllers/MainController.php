@@ -7,6 +7,8 @@ use App\Models\Transactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\Middleware;
+use Carbon\Carbon;
+
 
 class MainController
 {
@@ -67,21 +69,33 @@ class MainController
     {
         $user = Auth::user();
         $filter = $request->query('filter', 'daily');
+        $monthYear = $request->query('month_year', now()->format('Y-m'));
 
-        $transactions = $user->transactions()->get();
+        if (!preg_match('/^\d{4}-\d{2}$/', $monthYear)) {
+            return response()->json(['error' => 'Invalid month_year format'], 400);
+        }
+
+        [$year, $month] = array_map('intval', explode('-', $monthYear));
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = $startDate->copy()->endOfMonth();
+
+        $transactions = $user->transactions()
+            ->whereYear('date', $year)
+            ->get();
+
         $labels = collect();
         $incomeData = collect();
         $expenseData = collect();
+        $limitData = collect();
 
         if ($filter === 'daily') {
-            // Ambil jam dari created_at
             $labels = collect(range(0, 23))->map(fn($h) => sprintf('%02d:00', $h));
 
             $incomeData = $labels->map(fn($hour) => 
                 $transactions->where('type', 'income')
                     ->whereBetween('created_at', [
-                        now()->startOfDay()->addHours(intval(substr($hour, 0, 2))),
-                        now()->startOfDay()->addHours(intval(substr($hour, 0, 2)) + 1)
+                        $startDate->copy()->addHours((int) $hour),
+                        $startDate->copy()->addHours((int) $hour + 1)
                     ])
                     ->sum('amount')
             );
@@ -89,14 +103,13 @@ class MainController
             $expenseData = $labels->map(fn($hour) => 
                 $transactions->where('type', 'expense')
                     ->whereBetween('created_at', [
-                        now()->startOfDay()->addHours(intval(substr($hour, 0, 2))),
-                        now()->startOfDay()->addHours(intval(substr($hour, 0, 2)) + 1)
+                        $startDate->copy()->addHours((int) $hour),
+                        $startDate->copy()->addHours((int) $hour + 1)
                     ])
                     ->sum('amount')
             );
-
         } elseif ($filter === 'weekly') {
-            $startOfWeek = now()->startOfWeek();
+            $startOfWeek = $startDate->copy()->startOfWeek();
             $labels = collect(range(0, 6))->map(fn($d) => $startOfWeek->copy()->addDays($d)->format('l'));
 
             $incomeData = $labels->map(fn($label, $index) => 
@@ -116,16 +129,15 @@ class MainController
                     ])
                     ->sum('amount')
             );
-
         } elseif ($filter === 'monthly') {
-            $daysInMonth = now()->daysInMonth;
+            $daysInMonth = $startDate->daysInMonth;
             $labels = collect(range(1, $daysInMonth))->map(fn($d) => sprintf('%02d', $d));
 
             $incomeData = $labels->map(fn($day) => 
                 $transactions->where('type', 'income')
                     ->whereBetween('date', [
-                        now()->startOfMonth()->addDays($day - 1)->startOfDay(),
-                        now()->startOfMonth()->addDays($day - 1)->endOfDay()
+                        $startDate->copy()->addDays($day - 1)->startOfDay(),
+                        $startDate->copy()->addDays($day - 1)->endOfDay()
                     ])
                     ->sum('amount')
             );
@@ -133,20 +145,19 @@ class MainController
             $expenseData = $labels->map(fn($day) => 
                 $transactions->where('type', 'expense')
                     ->whereBetween('date', [
-                        now()->startOfMonth()->addDays($day - 1)->startOfDay(),
-                        now()->startOfMonth()->addDays($day - 1)->endOfDay()
+                        $startDate->copy()->addDays($day - 1)->startOfDay(),
+                        $startDate->copy()->addDays($day - 1)->endOfDay()
                     ])
                     ->sum('amount')
             );
-
         } elseif ($filter === 'yearly') {
-            $labels = collect(range(1, 12))->map(fn($m) => now()->startOfYear()->addMonths($m - 1)->format('F'));
+            $labels = collect(range(1, 12))->map(fn($m) => Carbon::create($year, $m, 1)->format('F'));
 
             $incomeData = $labels->map(fn($label, $index) => 
                 $transactions->where('type', 'income')
                     ->whereBetween('date', [
-                        now()->startOfYear()->addMonths($index)->startOfMonth(),
-                        now()->startOfYear()->addMonths($index)->endOfMonth()
+                        Carbon::create($year, $index + 1, 1)->startOfMonth(),
+                        Carbon::create($year, $index + 1, 1)->endOfMonth()
                     ])
                     ->sum('amount')
             );
@@ -154,23 +165,25 @@ class MainController
             $expenseData = $labels->map(fn($label, $index) => 
                 $transactions->where('type', 'expense')
                     ->whereBetween('date', [
-                        now()->startOfYear()->addMonths($index)->startOfMonth(),
-                        now()->startOfYear()->addMonths($index)->endOfMonth()
+                        Carbon::create($year, $index + 1, 1)->startOfMonth(),
+                        Carbon::create($year, $index + 1, 1)->endOfMonth()
                     ])
                     ->sum('amount')
             );
-        }
 
-        $monthlyLimit = $user->budgets()
-            ->where('month', now()->month)
-            ->where('year', now()->year)
-            ->first()?->monthly_limit ?? 0;
+            $limitData = $labels->map(fn($label, $index) => 
+                $user->budgets()
+                    ->where('month', $index + 1)
+                    ->where('year', $year)
+                    ->first()?->monthly_limit ?? 0
+            );
+        }
 
         return response()->json([
             'labels' => $labels,
             'income' => $incomeData,
             'expense' => $expenseData,
-            'limit' => $labels->map(fn() => $monthlyLimit),
+            'limit' => $limitData,
         ]);
     }
 

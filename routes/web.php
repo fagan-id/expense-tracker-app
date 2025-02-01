@@ -13,7 +13,6 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\TransactionsController;
-use App\Http\Controllers\ReportController;
 use App\Http\Controllers\wAuthRegisterController;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Stmt\Return_;
