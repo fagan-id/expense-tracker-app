@@ -10,6 +10,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\AuthRegisterController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\ReportController;
@@ -69,6 +70,13 @@ Route::controller(BudgetController::class)->group(function () {
     // Handle Input Request
     Route::patch('/budget/update/{id}', 'update')->name('budget.update');
     Route::post('/budget/store', 'store')->name('budget.store'); // Tambahkan Route Store
+});
+
+Route::controller(ReportController::class)->group(function(){
+
+    Route::get('/report', 'index');
+    Route::get('/report/monthly','monthly');
+    Route::get('/report/yearly','yearly');
 });
 
 // Google Login
