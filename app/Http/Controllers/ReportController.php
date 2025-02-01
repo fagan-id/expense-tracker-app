@@ -6,6 +6,7 @@ use App\Models\Transactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -19,7 +20,7 @@ class ReportController extends Controller
 
         $to = $from->copy()->endOfMonth();
 
-        $transactions = Transactions::whereUserId(Auth()->id)
+        $transactions = Transactions::whereUserId(Auth()->id())
             ->whereBetween('date', [$from, $to])
             ->get();
 
@@ -29,7 +30,7 @@ class ReportController extends Controller
     public function monthly(Request $request)
     {
         $year = $request->query('y', Carbon::now()->year);
-        $transactions = Transactions::whereUserId(Auth()->id)
+        $transactions = Transactions::whereUserId(Auth()->id())
             ->whereYear('date', $year)
             ->get()
             ->groupBy(function ($transaction) {
@@ -46,7 +47,7 @@ class ReportController extends Controller
 
     public function yearly(Request $request)
     {
-        $transactions = Transactions::whereUserId(Auth()->id)
+        $transactions = Transactions::whereUserId(Auth()->id())
             ->get()
             ->groupBy(function ($transaction) {
                 return Carbon::parse($transaction->date)->format('Y');
@@ -58,6 +59,36 @@ class ReportController extends Controller
         }
 
         return response()->json($summary);
+    }
+
+    public function generatePDF(Request $request)
+    {
+        $filter = $request->query('filter', 'monthly');
+        $year = $request->query('y', Carbon::now()->year);
+        $month = $request->query('m', Carbon::now()->month);
+
+        if ($filter === 'yearly') {
+            $transactions = Transactions::whereUserId(Auth()->id())
+                ->whereYear('date', $year)
+                ->get();
+        } else {
+            $from = Carbon::parse(sprintf('%s-%s-01', $year, $month));
+            $to = $from->copy()->endOfMonth();
+            $transactions = Transactions::whereUserId(Auth()->id())
+                ->whereBetween('date', [$from, $to])
+                ->get();
+        }
+
+        $summary = $this->processTransactions($transactions);
+
+        $pdf = Pdf::loadView('report.pdf', [
+            'user' => Auth::user(),
+            'transactions' => $transactions,
+            'summary' => $summary,
+            'filter' => ucfirst($filter),
+        ]);
+
+        return $pdf->stream("Report_{$filter}.pdf");
     }
 
     private function processTransactions($transactions)

@@ -12,6 +12,7 @@ use App\Http\Controllers\AuthRegisterController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\TransactionsController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\wAuthRegisterController;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Stmt\Return_;
@@ -27,7 +28,7 @@ Route::get('/dashboard',[MainController::class,'index'])->name('dashboard');
 Route::get('/transactions',[MainController::class,'transactions'])->name('transactions');
 Route::get('/settings',[MainController::class,'settings'])->name('settings');
 
-
+Route::get('/report/pdf', [ReportController::class, 'generatePDF'])->name('report.pdf');
 Route::get('/api/chart-data', [MainController::class, 'chartData']);
 
 

@@ -96,9 +96,12 @@
             });
     
             viewReportButton.addEventListener("click", function () {
-                const filter = chartFilter.value;
-                window.location.href = `/report?filter=${filter}`;
+                const year = new Date().getFullYear();
+                const month = new Date().getMonth() + 1;
+                const filter = document.getElementById("chartFilter").value;
+                window.open(`/report/pdf?filter=${filter}&y=${year}&m=${month}`, "_blank");
             });
+
     
             fetchData("daily");
         });
